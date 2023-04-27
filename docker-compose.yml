@@ -1,0 +1,42 @@
+services: 
+  tutorial:
+    restart: always
+    container_name: "docker_tutorial"
+    build:
+      context: ./ 
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www/html/ 
+    ports:
+      - 8080:80
+    networks:
+      - shared
+  db:
+    image: "mysql:5"
+    volumes:
+      - ./mysql:/etc/mysql/conf.d
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: toor
+    ports:
+      - "3300:3306"
+    networks:
+      - shared
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_PORT: 3306
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+    - "8000:80"
+    restart: always
+    depends_on: 
+    - db
+    networks:
+      - shared
+networks:
+  shared:
+    external:
+      name: docker_backend
